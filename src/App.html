@@ -355,7 +355,6 @@ export default {
       const { station_lookup, nyc_map } = this.get();
       const station  = station_lookup[id];
       nyc_map.flyTo(new L.LatLng(station.lat, station.lon), 15);
-      console.log(station)
     },
 
     drawMap() {
