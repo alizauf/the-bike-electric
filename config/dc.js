@@ -6,6 +6,8 @@ module.exports = {
   CITY_NAME: 'NYC',
   BIKESHARE_NAME: 'Capital Bikeshare',
   BIKESHARE_NAME_PLURAL: 'Capital Bikeshares',
+  BIKESHARE_BIKE_NAME: 'Capital Bikeshare bike',
+  BIKESHARE_BIKE_NAME_PLURAL: 'Capital Bikeshare bikes',
   BIKESHARE_DATA_URL: 'https://www.capitalbikeshare.com/system-data',
-  AUTHOR: "<a href='https://twitter.com/alizauf'>Aliza Aufrichtig</a> & <a href='https://twitter.com/schep_'>Daniel Schep</a>",
+  AUTHOR: "<a style='color: #0498e4; text-decoration: none;' href='https://twitter.com/alizauf'>Aliza Aufrichtig</a>, and remixed by <a style='color: #0498e4; text-decoration: none;' href='https://twitter.com/schep_'>Daniel Schep</a> for DC. See original at <a style='color: #0498e4; text-decoration: none;' href='https://www.i-want-to-ride-an-electric-citi.bike'>i-want-to-ride-an-electric-citi.bike",
 }
