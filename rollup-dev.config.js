@@ -6,7 +6,7 @@ import babel from "rollup-plugin-babel";
 import serve from 'rollup-plugin-serve';
 import replace from 'rollup-plugin-replace';
 
-const config = require(process.env.CONFIG || './nyc.js')
+const config = require(process.env.CONFIG || './config/nyc.js')
 
 export default {
 	entry: 'main.js',
