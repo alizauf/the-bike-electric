@@ -15,4 +15,4 @@ Clone this repo, then run:
 
 The app is written using [Svelte](https://github.com/sveltejs/svelte), [Leaflet](https://leafletjs.com/), and [Citi Bike's Real Time Data API](https://www.citibikenyc.com/system-data). It is not affiliated with, approved by, endorsed by, or sponsored by Citi Bike. 
 
-##I hope you find an ⚡️🚲!
+## I hope you find an ⚡️🚲!
