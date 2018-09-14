@@ -1,6 +1,6 @@
 # Is there an electric Citi Bike near you?
 
-This is the project that powers the website: [https://i-want-to-ride-an-electric-citi.bike](https://i-want-to-ride-an-electric-citi.bike)
+This is the project that powers the website: [https://www.i-want-to-ride-an-electric-citi.bike](https://www.i-want-to-ride-an-electric-citi.bike)
 
 Citi Bike operates the bike share in NYC. They've recently introduced electric bikes (⚡️🚲!)  and they are elusive as heck. After a weekend of not being able to find one, I made this app.
 
