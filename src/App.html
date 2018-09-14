@@ -1,0 +1,475 @@
+<div id='app'>
+  <section id='map'></section>
+  <div id='controls-and-footer'>
+    <section id='controls'>
+
+      <h1>Is there an electric Citi Bike near you?</h1>
+      {#if iOS}
+      <p class='explanation'>Quickly scan the map of NYC to find the ever-so-elusive Citi Bikes. <em>If one is near you, run, run like the wind!</em></p> 
+      <p>Sadly, iPhones and iPads don't allow browser alerts. If you visit this site on your computer, this app is even more helpful: you can follow stations and receive alerts when a bike appears.</p>
+      {:else}
+      <p class='explanation'>Be the first to know when an elusive electric Citi Bike docks at any station near you. <em>Then, run, run like the wind!</em></p>
+
+      {/if}
+
+      
+      {#if !iOS}
+        <h2>Your Stations</h2> 
+        {#if [...watched_stations].length > 0 && station_lookup}
+          {#each [...watched_stations] as station}
+            <div class='station-pill {hasEbike(stations_with_ebikes, station) ? "station-pill-has-ebike" : ""}' on:click='watchUnWatchStations(station)'>
+              {station_lookup[station].name} <span class='x-close'>x</span>
+            </div>
+          {/each}
+        {:else}
+          <p>Find Citi Bike stations near you on the map. <strong>Click on stations</strong> <span class='station-key'>●</span> to add them to your watch list. When an electric bike <span class='station-with-bike-key'>●</span> appears at any of your stations, you'll get an alert within 10 seconds. Then it's on you to get yourself electrified.</p>
+        {/if}
+
+
+        {#if alert_status === 'default'}
+          <p>🔔To receive e-bike alerts for your stations, you'll need to allow them in your browser. <span class='alert-helper' on:click='handleNotificationPermissions()'>Click here</span>, and then click "Allow" in your browser.</p>
+        {:elseif alert_status === 'granted'}
+          <p> 🔔Alerts enabled with{!sound ? "out" : ""} sound! <span class='alert-helper' on:click='set({sound: !sound})'>{sound ? "Turn off sound" : "Turn on sound"}</span>. <span class='alert-helper' on:click='notify("⚡🚲 I sing the bike electric.")'>Test alert</span>. </p>
+        {:elseif alert_status === 'denied'}
+          <p>🚫🔔Alerts disabled. No prob! Just keep your eyes on this page to get your sweet e-bike ride. (If you'd like to re-enable them, you'll need to go into your browser settings.)</p>
+        {/if}
+      {/if}
+      
+    
+      {#if num_ebikes}
+        {#if num_ebikes === 0}
+          <h2>E-bikes? What e-bikes? There are none available.</h2>
+        {:elseif num_ebikes === 1}
+          <h2>In this whole wide city, there is but 1 e-bike available. Go get it.</h2>
+        {:else}
+          <h2>There are {num_ebikes} electric bikes available right now.</h2>
+        {/if}
+      
+      {:else}
+        <h2>Finding e-bikes...</h2>
+      {/if}
+
+      <table>
+        <tr>
+          <th>Station name</th>
+          <th class='num-align'># E-bikes</th>
+        </tr>
+
+        {#each stations_with_ebikes as station_with_ebike}
+        <tr class='station-item' on:click='centerMapOnStation(station_with_ebike.station_id)'>
+          <td>{station_lookup[station_with_ebike.station_id].name}</td> <td class='num-align num'>{station_with_ebike.num_ebikes_available}</td>
+        </tr>
+        {/each}
+
+      </table>
+      <p class='datetime'>Last updated {lastUpdated ? lastUpdated.toString().slice(0,24): "Loading..."}</p>
+    </section>
+    <footer> 
+      <p>By <a href='https://twitter.com/alizauf'>Aliza Aufrichtig</a>, who has yet to ride an electric Citi Bike and considered not sharing this to have all the electric Citi Bikes, but it is a bike share after all.</p>
+
+      <p>Powered by <a href="https://www.citibikenyc.com/system-data">Citi Bike's Real-Time Data</a> and inspired by Citi Bike's real fun bike system. It is not affiliated with, approved by, endorsed by, or sponsored by Citi Bike. <a href='https://github.com/alizauf/the-bike-electric'>View the code here</a>. Lightening bolt favicon remixed from Nick Abrams's icon from the Noun Project. </p>
+
+      <p class='bike-electric'>
+        <em>I sing the bike electric, <br />
+        The armies of e-bikes I love engirth me and I engirth them,<br /> 
+        They will not let me off till I go with them, respond to them, <br />
+        And discorrupt them, and charge them full with the charge of the soul.</em> 
+      </p>
+    </footer>
+  </div> 
+</div>
+  
+
+<style>
+
+#app {
+  display: flex;
+  flex-direction: row-reverse;
+  padding: 0;
+}
+
+#controls {
+  padding: 40px;
+}
+
+#controls-and-footer {
+  flex: 0 0 40%;
+  height: 100vh;
+  overflow-y: scroll;
+  box-sizing: border-box;
+}
+
+#map {
+  height: 100vh;
+  flex: 0 0 60%;
+}
+
+h1 {
+  color: #052b6c;
+  font-size: 2.5em;
+  margin-top: 0;
+  line-height: 1.2;
+
+}
+
+h2 {
+  color: #052b6c;
+  margin-top: 30px;
+}
+
+p {
+  color: #2f2f2f
+}
+
+a {
+  color: #0498e4;
+  text-decoration: none;
+}
+
+footer {
+  background-color: #052b6c;
+  color: #fff;
+  width: 100%;
+  padding: 20px 40px;
+  box-sizing: border-box;
+}
+
+footer > p {
+  color: #fff;
+  font-weight: 100;
+}
+
+table {
+  border-spacing: 0;
+  width: 100%;
+
+}
+th {
+  background-color: #0498e4;
+  color: #fff;
+  padding: 10px;
+  text-align: left;
+  
+}
+
+th:first-child {
+  border-top-left-radius: 3px;
+}
+th:last-child {
+  border-top-right-radius: 3px;
+}
+
+tr {
+  border: none;
+  animation: backgroundColor 1.5s forwards;
+}
+
+@keyframes backgroundColor
+{
+  0%   {background-color: #ff0dbf;}
+  100% {background-color: #fff;}
+}
+
+td {
+  border-bottom: 1px solid #f4f4f4;
+  padding: 8px;
+  text-align: left;
+  
+}
+
+.station-item {
+  cursor: pointer;
+}
+
+.station-item:hover td {
+  background-color: rgba(255, 13, 190, 0.3);
+}
+
+.num-align {
+  text-align: right;
+  width: 70px;
+}
+
+.num {
+  font-feature-settings: "tnum";
+}
+
+.x-close {
+  margin-left: 5px;
+}
+
+.station-key {
+  color: #0498e4;
+}
+
+.alert-helper {
+  color: #0498e4;
+  cursor: pointer;
+}
+
+.station-with-bike-key {
+  width: 27px;
+  height: 27px;
+  border-radius: 40px;
+  border: 2px #ff0dbf solid;
+  background-color: rgba(255, 13, 190, 0.6);
+  display: inline-block;
+  text-align: center;
+  color: #0498e4;
+}
+
+.explanation {
+  font-size: 20px;
+}
+
+.datetime {
+  font-size: 14px;
+  font-style: italic;
+}
+
+.station-pill {
+  padding: 10px;
+  border-radius: 3px;
+  background-color: #0498e4;
+  display: inline-block;
+  cursor: pointer;
+  color: white;
+  margin-right: 10px;
+  margin-bottom: 10px;
+  font-size: 14px;
+}
+
+.station-pill-has-ebike {
+  background-color: #ff0dbf;
+}
+
+footer > .bike-electric {
+  margin-top: 40px;
+  color: #ff0dbf;
+}
+
+@media( max-width: 900px) {
+  #app {
+    display: block;
+  }
+
+  #map {
+    height: 60vh;
+  }
+
+  #controls-and-footer {
+    height: 40vh;
+  }
+
+  #controls {
+    padding: 20px;
+  }
+
+  footer {
+    padding: 20px;
+  }
+}
+</style>
+
+<script>
+
+const iOS = /(iPad|iPhone|iPod)/g.test(navigator.userAgent);
+
+export default {
+  data() {
+    return {
+      stations_with_ebikes: [],
+      watched_stations: new Set(),
+      alert_status: !iOS ? Notification.permission : "denied",
+      sound: true,
+      bell_sound: new Audio('../audio/bell.mp3'),
+      iOS
+    };
+  },
+
+  
+  oncreate() {
+    
+    const saved_stations = localStorage.getItem('watched_stations');
+    if (saved_stations) {
+      this.set({watched_stations: new Set(saved_stations.split(","))});
+    }
+    
+    this.drawMap();
+    
+    fetch("https://gbfs.citibikenyc.com/gbfs/en/station_information.json")
+    .then( res => res.json())
+    .then( response => {
+      const stations = response.data.stations; 
+
+      // watch all stations to test alerts
+      // this.set({watched_stations: new Set(stations.map(x => x.station_id))});
+      const station_lookup = {};
+      stations.forEach( x => station_lookup[x.station_id] = x);
+      this.set({stations, station_lookup});
+
+      this.checkForEBikes();
+      setInterval( () => this.checkForEBikes(), 10000);
+    }); 
+  },
+  
+  onstate({ changed, current, previous }) {
+    if (previous) {
+      const watched_stations = [...current.watched_stations];
+      const prev_stations_with_ebikes = [...previous.stations_with_ebikes];
+      const current_stations_with_ebikes = [...current.stations_with_ebikes];
+      watched_stations.forEach( station => {
+        if (!prev_stations_with_ebikes.map(x => x.station_id).includes(station) && current_stations_with_ebikes.map(x => x.station_id).includes(station)) {
+          this.notify(`⚡🚲 ${current.station_lookup[station].name} has an e-bike!`);
+        }
+        
+        const current_more_than_one = current_stations_with_ebikes
+          .filter( x => x.num_ebikes_available > 1);
+
+        //Didn't design this well to handle knowledge of >1 bike. Thus this ugly section.
+        if (current_more_than_one.length) { 
+          const prev_lookup = {};
+          const prev_more_than_one = prev_stations_with_ebikes
+            .filter( x => x.num_ebikes_available > 1).forEach( x => {
+              prev_lookup[x.station_id] = x.num_ebikes_available;
+            });
+
+          current_more_than_one.forEach( x => {
+            if (prev_lookup[x.station_id] < x.num_ebikes_available) {
+              this.notify(`⚡🚲 ${current.station_lookup[station].name} now has ${x.num_ebikes_available} e-bikes!`);
+            }
+          });
+        }    
+      });
+    }
+  },
+  
+  helpers: {
+    hasEbike(stations_with_ebikes, station) {
+      return stations_with_ebikes.map(x => x.station_id).includes(station) ? true : false;      
+    }
+  },
+  
+  methods: {
+    centerMapOnStation(id) {
+      const { station_lookup, nyc_map } = this.get();
+      const station  = station_lookup[id];
+      nyc_map.flyTo(new L.LatLng(station.lat, station.lon), 15);
+      console.log(station)
+    },
+
+    drawMap() {
+      const nyc_map = L.map('map').setView([40.7055585, -73.989109 ], 13);
+      this.set({nyc_map});
+      L.tileLayer( 'https://stamen-tiles-{s}.a.ssl.fastly.net/toner/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a id="home-link" target="_top" href="../">Map tiles</a> by <a target="_top" href="http://stamen.com">Stamen Design</a>, under <a target="_top" href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a target="_top" href="http://openstreetmap.org">OpenStreetMap</a>, under <a target="_top" href="http://creativecommons.org/licenses/by-sa/3.0">CC BY SA</a>.'
+      }).addTo( nyc_map );
+    },
+
+    circleClick(e) {
+      const selected_station = e.target.station_id;
+      this.watchUnWatchStations(selected_station);
+      this.drawStations();
+    },
+    
+    watchUnWatchStations(selected_station) {
+      const { watched_stations } = this.get();
+      if (watched_stations.has(selected_station)) {
+        watched_stations.delete(selected_station);
+      } else {
+        watched_stations.add(selected_station);
+      }
+      this.set({watched_stations});
+      const watched_string = [...watched_stations].join(",")
+      localStorage.setItem("watched_stations", watched_string );
+      
+    },
+    
+    notify(text) {
+      const { sound, bell_sound } = this.get();
+      if (!iOS) {
+        if (Notification.permission === 'granted') {
+          new Notification(text);
+          if (sound) {
+            bell_sound.play();
+          }
+        }
+      }
+    },
+    
+    handleNotificationPermissions() {
+      const that = this;
+      if (!iOS) {
+        const permission = Notification.permission;
+        Notification.requestPermission().then( result => {
+          that.set({alert_status: result});
+        });
+      }
+    },
+    
+    checkForEBikes () {
+      fetch('https://gbfs.citibikenyc.com/gbfs/en/station_status.json')
+      .then( res => res.json())
+      .then( response => {
+        const station_data = response.data.stations;
+        
+        const num_ebikes = station_data.map( x => x.num_ebikes_available).reduce( (a,b) => a + b);
+        const stations_with_ebikes = station_data.filter( x => x.num_ebikes_available).map( x => {
+          return {
+            station_id: x.station_id,
+            num_ebikes_available: x.num_ebikes_available
+          };
+        });
+        this.set({num_ebikes, stations_with_ebikes, lastUpdated: new Date()});
+        this.drawStations();
+      })
+    },
+    
+    drawStations() {
+      
+      const group = L.featureGroup();
+      const { stations, nyc_map, watched_stations, num_ebikes, stations_with_ebikes } = this.get();
+      
+      stations.forEach( station => {
+        if (stations_with_ebikes.map( x => x.station_id).includes(station.station_id) ) {
+          const big_circle = L.circle([station.lat, station.lon], {
+            color: '#ff0dbf',
+            fillColor: '#ff0dbf',
+            fillOpacity: .6,
+            radius: 200
+          })
+          
+          big_circle.station_id = station.station_id;
+          big_circle.station_name = station.name;
+          big_circle.on("click", this.circleClick, this);
+          big_circle.addTo(group);
+        } 
+
+        const circle = L.circle([station.lat, station.lon], {
+          color: watched_stations.has(station.station_id) ? '#ff0dbf' : 'transparent',
+          weight: 1,
+          fillColor:  '#0498e4',
+          fillOpacity: .9,
+          radius: 50
+        })
+        
+        circle.station_id = station.station_id;
+        circle.station_name = station.name;
+        circle.on("click", this.circleClick, this);
+        circle.addTo(group);
+        
+      });
+
+      const { prevGroup } = this.get();
+      if ( prevGroup ){
+        nyc_map.removeLayer(prevGroup);
+      }
+      this.set({prevGroup: group});
+      
+      nyc_map.addLayer(group);
+    }
+  } 
+};
+
+</script>
+
