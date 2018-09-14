@@ -3,12 +3,12 @@
   <div id='controls-and-footer'>
     <section id='controls'>
 
-      <h1>Is there an electric BIKESHARE_NAME near you?</h1>
+      <h1>Is there an electric BIKESHARE_BIKE_NAME near you?</h1>
       {#if iOS}
       <p class='explanation'>Quickly scan the map of CITY_NAME to find the ever-so-elusive BIKESHARE_NAME_PLURAL. <em>If one is near you, run, run like the wind!</em></p> 
       <p>Sadly, iPhones and iPads don't allow browser alerts. If you visit this site on your computer, this app is even more helpful: you can follow stations and receive alerts when a bike appears.</p>
       {:else}
-      <p class='explanation'>Be the first to know when an elusive electric BIKESHARE_NAME docks at any station near you. <em>Then, run, run like the wind!</em></p>
+      <p class='explanation'>Be the first to know when an elusive electric BIKESHARE_BIKE_NAME docks at any station near you. <em>Then, run, run like the wind!</em></p>
 
       {/if}
 
@@ -65,7 +65,7 @@
       <p class='datetime'>Last updated {lastUpdated ? lastUpdated.toString().slice(0,24): "Loading..."}</p>
     </section>
     <footer> 
-      <p>By AUTHOR, who has yet to ride an electric BIKESHARE_NAME and considered not sharing this to have all the electric BIKESHARE_NAME_PLURAL, but it is a bike share after all.</p>
+      <p>By AUTHOR.</p>
 
       <p>Powered by <a href="BIKESHARE_DATA_URL">BIKESHARE_NAME's Real-Time Data</a> and inspired by BIKESHARE_NAME's real fun bike system. It is not affiliated with, approved by, endorsed by, or sponsored by BIKESHARE_NAME. <a href='https://github.com/alizauf/the-bike-electric'>View the code here</a>. Lightning bolt favicon remixed from Nick Abrams's icon from the Noun Project. </p>
 
@@ -471,4 +471,3 @@ export default {
 };
 
 </script>
-
