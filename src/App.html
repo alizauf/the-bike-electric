@@ -3,12 +3,12 @@
   <div id='controls-and-footer'>
     <section id='controls'>
 
-      <h1>Is there an electric Citi Bike near you?</h1>
+      <h1>Is there an electric BIKESHARE_NAME near you?</h1>
       {#if iOS}
-      <p class='explanation'>Quickly scan the map of NYC to find the ever-so-elusive Citi Bikes. <em>If one is near you, run, run like the wind!</em></p> 
+      <p class='explanation'>Quickly scan the map of CITY_NAME to find the ever-so-elusive BIKESHARE_NAME_PLURAL. <em>If one is near you, run, run like the wind!</em></p> 
       <p>Sadly, iPhones and iPads don't allow browser alerts. If you visit this site on your computer, this app is even more helpful: you can follow stations and receive alerts when a bike appears.</p>
       {:else}
-      <p class='explanation'>Be the first to know when an elusive electric Citi Bike docks at any station near you. <em>Then, run, run like the wind!</em></p>
+      <p class='explanation'>Be the first to know when an elusive electric BIKESHARE_NAME docks at any station near you. <em>Then, run, run like the wind!</em></p>
 
       {/if}
 
@@ -22,7 +22,7 @@
             </div>
           {/each}
         {:else}
-          <p>Find Citi Bike stations near you on the map. <strong>Click on stations</strong> <span class='station-key'>●</span> to add them to your watch list. When an electric bike <span class='station-with-bike-key'>●</span> appears at any of your stations, you'll get an alert within 10 seconds. Then it's on you to get yourself electrified.</p>
+          <p>Find BIKESHARE_NAME stations near you on the map. <strong>Click on stations</strong> <span class='station-key'>●</span> to add them to your watch list. When an electric bike <span class='station-with-bike-key'>●</span> appears at any of your stations, you'll get an alert within 10 seconds. Then it's on you to get yourself electrified.</p>
         {/if}
 
 
@@ -65,9 +65,9 @@
       <p class='datetime'>Last updated {lastUpdated ? lastUpdated.toString().slice(0,24): "Loading..."}</p>
     </section>
     <footer> 
-      <p>By <a href='https://twitter.com/alizauf'>Aliza Aufrichtig</a>, who has yet to ride an electric Citi Bike and considered not sharing this to have all the electric Citi Bikes, but it is a bike share after all.</p>
+      <p>By AUTHOR, who has yet to ride an electric BIKESHARE_NAME and considered not sharing this to have all the electric BIKESHARE_NAME_PLURAL, but it is a bike share after all.</p>
 
-      <p>Powered by <a href="https://www.citibikenyc.com/system-data">Citi Bike's Real-Time Data</a> and inspired by Citi Bike's real fun bike system. It is not affiliated with, approved by, endorsed by, or sponsored by Citi Bike. <a href='https://github.com/alizauf/the-bike-electric'>View the code here</a>. Lightning bolt favicon remixed from Nick Abrams's icon from the Noun Project. </p>
+      <p>Powered by <a href="BIKESHARE_DATA_URL">BIKESHARE_NAME's Real-Time Data</a> and inspired by BIKESHARE_NAME's real fun bike system. It is not affiliated with, approved by, endorsed by, or sponsored by BIKESHARE_NAME. <a href='https://github.com/alizauf/the-bike-electric'>View the code here</a>. Lightning bolt favicon remixed from Nick Abrams's icon from the Noun Project. </p>
 
       <p class='bike-electric'>
         <em>I sing the bike electric, <br />
@@ -297,7 +297,7 @@ export default {
     
     this.drawMap();
     
-    fetch("https://gbfs.citibikenyc.com/gbfs/en/station_information.json")
+    fetch(STATION_INFORMATION_GBFS)
     .then( res => res.json())
     .then( response => {
       const stations = response.data.stations; 
@@ -352,17 +352,17 @@ export default {
   
   methods: {
     centerMapOnStation(id) {
-      const { station_lookup, nyc_map } = this.get();
+      const { station_lookup, map } = this.get();
       const station  = station_lookup[id];
-      nyc_map.flyTo(new L.LatLng(station.lat, station.lon), 15);
+      map.flyTo(new L.LatLng(station.lat, station.lon), 15);
     },
 
     drawMap() {
-      const nyc_map = L.map('map').setView([40.7055585, -73.989109 ], 13);
-      this.set({nyc_map});
+      const map = L.map('map').setView(MAP_CENTER, MAP_ZOOM);
+      this.set({map});
       L.tileLayer( 'https://stamen-tiles-{s}.a.ssl.fastly.net/toner/{z}/{x}/{y}.png', {
         attribution: '&copy; <a id="home-link" target="_top" href="../">Map tiles</a> by <a target="_top" href="http://stamen.com">Stamen Design</a>, under <a target="_top" href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a target="_top" href="http://openstreetmap.org">OpenStreetMap</a>, under <a target="_top" href="http://creativecommons.org/licenses/by-sa/3.0">CC BY SA</a>.'
-      }).addTo( nyc_map );
+      }).addTo( map );
     },
 
     circleClick(e) {
@@ -407,7 +407,7 @@ export default {
     },
     
     checkForEBikes () {
-      fetch('https://gbfs.citibikenyc.com/gbfs/en/station_status.json')
+      fetch(STATION_STATUS_GBFS)
       .then( res => res.json())
       .then( response => {
         const station_data = response.data.stations;
@@ -427,7 +427,7 @@ export default {
     drawStations() {
       
       const group = L.featureGroup();
-      const { stations, nyc_map, watched_stations, num_ebikes, stations_with_ebikes } = this.get();
+      const { stations, map, watched_stations, num_ebikes, stations_with_ebikes } = this.get();
       
       stations.forEach( station => {
         if (stations_with_ebikes.map( x => x.station_id).includes(station.station_id) ) {
@@ -461,11 +461,11 @@ export default {
 
       const { prevGroup } = this.get();
       if ( prevGroup ){
-        nyc_map.removeLayer(prevGroup);
+        map.removeLayer(prevGroup);
       }
       this.set({prevGroup: group});
       
-      nyc_map.addLayer(group);
+      map.addLayer(group);
     }
   } 
 };
