@@ -3,7 +3,7 @@ module.exports = {
   STATION_INFORMATION_GBFS: "'https://gbfs.capitalbikeshare.com/gbfs/en/station_information.json'",
   MAP_CENTER: "[38.91, -77.04]",
   MAP_ZOOM: 13,
-  CITY_NAME: 'NYC',
+  CITY_NAME: 'DC',
   BIKESHARE_NAME: 'Capital Bikeshare',
   BIKESHARE_NAME_PLURAL: 'Capital Bikeshares',
   BIKESHARE_BIKE_NAME: 'Capital Bikeshare bike',
