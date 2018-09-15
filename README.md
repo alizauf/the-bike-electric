@@ -23,13 +23,12 @@ The app is written using [Svelte](https://github.com/sveltejs/svelte), [Leaflet]
 [Daniel Schep](https://www.twitter.com/schep_) updated the bike electric to work more easily with any
 bikeshare operator with electric bikes that provides [GBFS](https://github.com/NABSA/gbfs) feeds.
 
+The DC version is hosted on glitch and you can remix it for your own city.
+
+[![Remix on Glitch](https://cdn.glitch.com/2703baf2-b643-4da7-ab91-7ee2a2d00b5b%2Fremix-button.svg)](https://glitch.com/edit/#!/remix/the-cabi-electric)
+
 See `config/nyc.js` and `config/dc.js` for examples of how to configure the bike electric for different cities.
-Create your own config at `config/CITYNAME.js` and run locally with: 
-```
-npm install
-CONFIG=./config/CITYNAME.js npm run dev
-```
-And compile a production version with:
-```
-CONFIG=./config/CITYNAME.js npm run build
+Create your own config at `config/CITYNAME.js` and update `.env` to contain:
+```shell
+CONFIG=./config/CITYNAME.js
 ```

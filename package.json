@@ -12,6 +12,7 @@
     "svelte": "^2.6.1"
   },
   "scripts": {
+    "start": "npm run dev",
     "build": "rollup -c rollup-production.config.js",
     "dev": "rollup -c rollup-dev.config.js -w"
   }

@@ -26,7 +26,7 @@ export default {
     serve({
       contentBase: '',
       host: 'localhost',
-      port: 4321
+      port: process.env.PORT || 4321
     }),
     replace(config),
 	]
