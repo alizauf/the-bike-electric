@@ -17,7 +17,7 @@
         <h2>Your Stations</h2> 
         {#if [...watched_stations].length > 0 && station_lookup}
           {#each [...watched_stations] as station}
-            <div class='station-pill {hasEbike(stations_with_ebikes, station) ? "station-pill-has-ebike" : ""}' on:click='watchUnWatchStations(station)'>
+            <div class='station-pill {getPillClass(stations_with_ebikes, station)}' on:click='watchUnWatchStations(station)'>
               {station_lookup[station].name} <span class='x-close'>x</span>
             </div>
           {/each}
@@ -263,6 +263,10 @@ td {
   background-color: #ff0dbf;
 }
 
+.station-pill-has-freebike {
+  background-color: #5ae14c;
+}
+
 footer > .bike-electric {
   margin-top: 40px;
   color: #ff0dbf;
@@ -365,8 +369,9 @@ export default {
   },
   
   helpers: {
-    hasEbike(stations_with_ebikes, station) {
-      return stations_with_ebikes.map(x => x.station_id).includes(station) ? true : false;      
+    getPillClass(stations_with_ebikes, station_id) {
+      let station = stations_with_ebikes.filter(x => x.station_id == station_id)[0]
+      return station ? station['pill_class'] : '';
     }
   },
   
@@ -444,6 +449,7 @@ export default {
           return {
             station_id: x.station_id,
             class: freebike_station_ids.includes(x.station_id) ? 'free-station-item' : 'station-item',
+            pill_class: freebike_station_ids.includes(x.station_id) ? 'station-pill-has-freebike' : 'station-pill-has-ebike',
             num_ebikes_available: x.num_ebikes_available
           };
         });
