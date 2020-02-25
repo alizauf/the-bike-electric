@@ -17,12 +17,13 @@
         <h2>Your Stations</h2> 
         {#if [...watched_stations].length > 0 && station_lookup}
           {#each [...watched_stations] as station}
-            <div class='station-pill {hasEbike(stations_with_ebikes, station) ? "station-pill-has-ebike" : ""}' on:click='watchUnWatchStations(station)'>
+            <div class='station-pill {getPillClass(stations_with_ebikes, station)}' on:click='watchUnWatchStations(station)'>
               {station_lookup[station].name} <span class='x-close'>x</span>
             </div>
           {/each}
         {:else}
-          <p>Find BIKESHARE_NAME stations near you on the map. <strong>Click on stations</strong> <span class='station-key'>●</span> to add them to your watch list. When an electric bike <span class='station-with-bike-key'>●</span> appears at any of your stations, you'll get an alert within 10 seconds. Then it's on you to get yourself electrified.</p>
+        <p>Find BIKESHARE_NAME stations near you on the map. <strong>Click on stations</strong> <span class='station-key'>●</span> to add them to your watch list. When an electric bike <span class='station-with-bike-key'>●</span> appears at any of your stations, you'll get an alert within 10 seconds. Then it's on you to get yourself electrified.</p>
+        <p>Stations with only electric bikes available <span class='station-with-free-bike-key'>●</span> <a href="https://twitter.com/CitiBikeNYC/status/1232032555559456769" target="_blank">waive</a> the EBIKE_FEES.</p>
         {/if}
 
 
@@ -56,7 +57,7 @@
         </tr>
 
         {#each stations_with_ebikes as station_with_ebike}
-        <tr class='station-item' on:click='centerMapOnStation(station_with_ebike.station_id)'>
+        <tr class='{station_with_ebike.class}' on:click='centerMapOnStation(station_with_ebike.station_id)'>
           <td>{station_lookup[station_with_ebike.station_id].name}</td> <td class='num-align num'>{station_with_ebike.num_ebikes_available}</td>
         </tr>
         {/each}
@@ -185,6 +186,14 @@ td {
   background-color: rgba(255, 13, 190, 0.3);
 }
 
+.free-station-item {
+  cursor: pointer;
+}
+
+.free-station-item:hover td {
+  background-color: rgba(90, 225, 75, 0.6);
+}
+
 .num-align {
   text-align: right;
   width: 70px;
@@ -218,6 +227,17 @@ td {
   color: #0498e4;
 }
 
+.station-with-free-bike-key {
+  width: 27px;
+  height: 27px;
+  border-radius: 40px;
+  border: 2px #5ae14c solid;
+  background-color: rgba(90, 225, 75, 0.6);
+  display: inline-block;
+  text-align: center;
+  color: #0498e4;
+}
+
 .explanation {
   font-size: 20px;
 }
@@ -241,6 +261,10 @@ td {
 
 .station-pill-has-ebike {
   background-color: #ff0dbf;
+}
+
+.station-pill-has-freebike {
+  background-color: #5ae14c;
 }
 
 footer > .bike-electric {
@@ -345,8 +369,9 @@ export default {
   },
   
   helpers: {
-    hasEbike(stations_with_ebikes, station) {
-      return stations_with_ebikes.map(x => x.station_id).includes(station) ? true : false;      
+    getPillClass(stations_with_ebikes, station_id) {
+      let station = stations_with_ebikes.filter(x => x.station_id == station_id)[0]
+      return station ? station['pill_class'] : '';
     }
   },
   
@@ -413,13 +438,22 @@ export default {
         const station_data = response.data.stations;
         
         const num_ebikes = station_data.map( x => x.num_ebikes_available).reduce( (a,b) => a + b);
-        const stations_with_ebikes = station_data.filter( x => x.num_ebikes_available).map( x => {
+        const stations_with_freebikes = station_data.filter( x => x.num_ebikes_available && x.num_ebikes_available == x.num_bikes_available).map( x => {
           return {
             station_id: x.station_id,
             num_ebikes_available: x.num_ebikes_available
           };
         });
-        this.set({num_ebikes, stations_with_ebikes, lastUpdated: new Date()});
+        const freebike_station_ids = stations_with_freebikes.map( x => x.station_id);
+        const stations_with_ebikes = station_data.filter( x => x.num_ebikes_available).map( x => {
+          return {
+            station_id: x.station_id,
+            class: freebike_station_ids.includes(x.station_id) ? 'free-station-item' : 'station-item',
+            pill_class: freebike_station_ids.includes(x.station_id) ? 'station-pill-has-freebike' : 'station-pill-has-ebike',
+            num_ebikes_available: x.num_ebikes_available
+          };
+        });
+        this.set({num_ebikes, stations_with_ebikes, freebike_station_ids, lastUpdated: new Date()});
         this.drawStations();
       })
     },
@@ -427,13 +461,15 @@ export default {
     drawStations() {
       
       const group = L.featureGroup();
-      const { stations, map, watched_stations, num_ebikes, stations_with_ebikes } = this.get();
+      const { stations, map, watched_stations, num_ebikes, stations_with_ebikes, freebike_station_ids } = this.get();
+      const ebike_station_ids = stations_with_ebikes.map( x => x.station_id);
       
       stations.forEach( station => {
-        if (stations_with_ebikes.map( x => x.station_id).includes(station.station_id) ) {
+        if (ebike_station_ids.includes(station.station_id) ) {
+          const color = freebike_station_ids.includes(station.station_id) ? '#5ae14c' : '#ff0dbf';
           const big_circle = L.circle([station.lat, station.lon], {
-            color: '#ff0dbf',
-            fillColor: '#ff0dbf',
+            color: color,
+            fillColor: color,
             fillOpacity: .6,
             radius: 200
           })
