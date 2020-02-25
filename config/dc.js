@@ -3,6 +3,7 @@ module.exports = {
   STATION_INFORMATION_GBFS: "'https://gbfs.capitalbikeshare.com/gbfs/en/station_information.json'",
   MAP_CENTER: "[38.91, -77.04]",
   MAP_ZOOM: 13,
+  EBIKE_FEES: "<a style='color: #0498e4; text-decoration: none;' href='https://ddot.dc.gov/release/improved-e-bikes-return-capital-bikeshare-spring' target='_blank'>electric surcharge</a>",
   CITY_NAME: 'DC',
   BIKESHARE_NAME: 'Capital Bikeshare',
   BIKESHARE_NAME_PLURAL: 'Capital Bikeshares',
